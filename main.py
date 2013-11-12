@@ -1,7 +1,3 @@
- #! /usr/bin/python
-
-# From:http://stackoverflow.com/questions/14354171/add-scrolling-to-a-platformer-in-pygame
-
 import pygame
 from pygame import *
 
@@ -29,6 +25,10 @@ class Debug(object):
 debug = Debug()
 debug.enable = True
 
+##############################################################################
+# Main 
+# Includes initialization, and the main game loop
+##############################################################################
 def main():
     pygame.init()
     screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
@@ -45,7 +45,7 @@ def main():
     bg.fill(Color("#000000"))
 
     player = Player(BLK_SIZE, BLK_SIZE)
-    camera = Camera(complex_camera, map.width, map.height)
+    camera = Camera(map.width, map.height)
     entities.add(player)
     while 1:
         timer.tick(60)
@@ -59,36 +59,46 @@ def main():
             screen.blit(e.image, camera.apply(e)) #CAMERA
         pygame.display.update()
 
+##############################################################################
+# Main 
+# Includes initialization, and the main game loop
+##############################################################################
 class Camera(object):
-    def __init__(self, camera_func, width, height):
-        self.camera_func = camera_func
+    def __init__(self, width, height):
         self.state = Rect(0, 0, width, height)
     # provide the offset for each block
     def apply(self, target):
         return target.rect.move(self.state.topleft)
     def update(self, target):
-        self.state = self.camera_func(self.state, target.rect)
+        self.state = self.complex_camera(self.state, target.rect)
 
-def simple_camera(camera, target_rect):
-    l, t, _, _ = target_rect # left , top position
-    # _, _, w, h = camera # width, height of camera
-    w = WIN_WIDTH
-    h = WIN_HEIGHT
+    #TODO: integrate into class
+    def simple_camera(self, camera, target_rect):
+        l, t, _, _ = target_rect # left , top position
+        # _, _, w, h = camera # width, height of camera
+        w = WIN_WIDTH
+        h = WIN_HEIGHT
+        # center the camera on the target 
+        return Rect(-l+HALF_WIDTH, -t+HALF_HEIGHT, w, h)
 
-    # center the camera on the target 
-    return Rect(-l+HALF_WIDTH, -t+HALF_HEIGHT, w, h)
+    #TODO: integrate into class
+    def complex_camera(self, camera, target_rect):
+        l, t, _, _ = target_rect
+        _, _, w, h = camera
+        l, t, _, _ = -l+HALF_WIDTH, -t+HALF_HEIGHT, w, h
 
-def complex_camera(camera, target_rect):
-    l, t, _, _ = target_rect
-    _, _, w, h = camera
-    l, t, _, _ = -l+HALF_WIDTH, -t+HALF_HEIGHT, w, h
+        l = min(0, l)                           # stop scrolling at the left edge
+        l = max(-(camera.width-WIN_WIDTH), l)   # stop scrolling at the right edge
+        t = max(-(camera.height-WIN_HEIGHT), t) # stop scrolling at the bottom
+        t = min(0, t)                           # stop scrolling at the top
+        return Rect(l, t, w, h)
 
-    l = min(0, l)                           # stop scrolling at the left edge
-    l = max(-(camera.width-WIN_WIDTH), l)   # stop scrolling at the right edge
-    t = max(-(camera.height-WIN_HEIGHT), t) # stop scrolling at the bottom
-    t = min(0, t)                           # stop scrolling at the top
-    return Rect(l, t, w, h)
-
+##############################################################################
+# Map
+# contains text map 
+# method to build the map out of platforms
+# method to redraw map
+##############################################################################
 class Map(object):
     def __init__(self):
         self.platforms = []
@@ -145,6 +155,10 @@ class Map(object):
             self.y += BLK_SIZE
             self.x = 0
     
+##############################################################################
+# Main 
+# Includes initialization, and the main game loop
+##############################################################################
 class Action(object):
     def __init__(self):
 
@@ -190,10 +204,22 @@ class Action(object):
                 self.status['right'] = False
 
 
+##############################################################################
+# Entity
+# create a sprite
+##############################################################################
 class Entity(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
+##############################################################################
+# Player
+# Takes care of players:
+# location/location
+# collision with platforms
+# TODO:
+# - health
+##############################################################################
 class Player(Entity):
     def __init__(self, x, y):
         Entity.__init__(self)
@@ -243,6 +269,10 @@ class Player(Entity):
                 if yvel < 0:
                     self.rect.top = p.rect.bottom
 
+##############################################################################
+# Platform 
+# surfaces that make up the games terrain
+##############################################################################
 class Platform(Entity):
     def __init__(self, x, y):
         Entity.__init__(self)
@@ -250,14 +280,21 @@ class Platform(Entity):
         self.image.convert()
         self.image.fill(Color("#DDDDDD"))
         self.rect = Rect(x, y, BLK_SIZE, BLK_SIZE)
-
     def update(self):
         pass
 
+##############################################################################
+# Exitblock 
+# surface when touched ends the game
+##############################################################################
 class ExitBlock(Platform):
     def __init__(self, x, y):
         Platform.__init__(self, x, y)
         self.image.fill(Color("#0033FF"))
 
+##############################################################################
+# This runs main once every other function is defined
+# this must last.
+##############################################################################
 if __name__ == "__main__":
     main()
