@@ -1,0 +1,27 @@
+Artificial Intelligence
+======================
+
+Goals/ progression
+------------------
+1. Create new moving block that moved in one direction
+2. Move in opposite direction if collision with wall is detected
+3. Move toward player, but not all the time (timer / counter ?)
+4. Jumpy toward player, but not all the time (timer / counter ?)
+5. detect ledges and avoid them
+
+Types of AI
+-----------
+hostile
+follower
+neutral
+fear
+
+
+basic logic
+-----------
+in main loop
+update ai
+- updating ai move them randomly
+
+Loop thought checking for collision with player
+- end game if the player is touched
