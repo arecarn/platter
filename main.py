@@ -60,8 +60,8 @@ def main():
         pygame.display.update()
 
 ##############################################################################
-# Main 
-# Includes initialization, and the main game loop
+# Camera
+# keep scroll on the map following a target sprite
 ##############################################################################
 class Camera(object):
     def __init__(self, width, height):
@@ -156,8 +156,8 @@ class Map(object):
             self.x = 0
     
 ##############################################################################
-# Main 
-# Includes initialization, and the main game loop
+# Action
+# Handles keyboard events/ especially movment
 ##############################################################################
 class Action(object):
     def __init__(self):
