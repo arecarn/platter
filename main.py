@@ -25,6 +25,7 @@ class Debug(object):
 debug = Debug()
 debug.enable = True
 
+
 ##############################################################################
 # Main 
 # Includes initialization, and the main game loop
@@ -40,23 +41,24 @@ def main():
     action = Action()
 
     # TODO: move this to it's own class?
-    bg = Surface((BLK_SIZE,BLK_SIZE))
-    bg.convert()
-    bg.fill(Color("#000000"))
+    bg = Background("#000000", BLK_SIZE, BLK_SIZE)
 
     player = Player(BLK_SIZE, BLK_SIZE)
     camera = Camera(map.width, map.height)
     entities.add(player)
     while 1:
         timer.tick(60)
-        action.check() # check for events
+
+        action.check(player.status) # check for events
+
         map.draw(screen, bg)
-        camera.update(player) #CAMERA
-        # update player
-        player.update(action.status, map.platforms)
+
+        camera.update(player) # update player camera TODO needs better discription
+        player.updateLocation(map.platforms) 
+
         # draw everything with offset
         for e in entities:
-            screen.blit(e.image, camera.apply(e)) #CAMERA
+            screen.blit(e.image, camera.apply(e)) # update entities with of set Camera
         pygame.display.update()
 
 ##############################################################################
@@ -104,33 +106,34 @@ class Map(object):
         self.platforms = []
         self.x = 0
         self.y = 0
+        # TODO mode map into separate files
         self.level = [
-            "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-            "P                                                                                    P",
-            "P                                                                                    P",
-            "P                           E                                        E               P",
-            "P                     PPPPPPPPPPP                              PPPPPPPPPPP           P",
-            "P                                                                                    P",
-            "P                                                                                    P",
-            "P                                                                                    P",
-            "P     PPPPPPPP                                 PPPPPPPP                              P",
-            "P                                                                                    P",
-            "P                           PPPPPPP                                  PPPPPPP         P",
-            "P                  PPPPPP                                   PPPPPP                   P",
-            "P                                                                                    P",
-            "P          PPPPPPP                                  PPPPPPP                          P",
-            "P                                                                                    P",
-            "P                      PPPPPP                                   PPPPPP               P",
-            "P                                                                                    P",
-            "P    PPPPPPPPPPP                              PPPPPPPPPPP                            P",
-            "P                                                                                    P",
-            "P                     PPPPPPP                                  PPPPPPP               P",
-            "P                                                                                    P",
-            "P                  PPPPPPPPPPP                              PPPPPPPPPPP              P",
-            "P                                                                                    P",
-            "P                                                                                    P",
-            "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-            ]
+                "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+                "P                                                                                    P",
+                "P                                                                                    P",
+                "P                           E                                        E               P",
+                "P                     PPPPPPPPPPP                              PPPPPPPPPPP           P",
+                "P                                                                                    P",
+                "P                                                                                    P",
+                "P                                                                                    P",
+                "P     PPPPPPPP                                 PPPPPPPP                              P",
+                "P                                                                                    P",
+                "P                           PPPPPPP                                  PPPPPPP         P",
+                "P                  PPPPPP                                   PPPPPP                   P",
+                "P                                                                                    P",
+                "P          PPPPPPP                                  PPPPPPP                          P",
+                "P                                                                                    P",
+                "P                      PPPPPP                                   PPPPPP               P",
+                "P                                                                                    P",
+                "P    PPPPPPPPPPP                              PPPPPPPPPPP                            P",
+                "P                                                                                    P",
+                "P                     PPPPPPP                                  PPPPPPP               P",
+                "P                                                                                    P",
+                "P                  PPPPPPPPPPP                              PPPPPPPPPPP              P",
+                "P                                                                                    P",
+                "P                                                                                    P",
+                "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+                ]
         self.width  = len(self.level[0])*BLK_SIZE
         self.height = len(self.level)*BLK_SIZE
 
@@ -154,55 +157,46 @@ class Map(object):
                 self.x += BLK_SIZE
             self.y += BLK_SIZE
             self.x = 0
-    
+
 ##############################################################################
 # Action
 # Handles keyboard events/ especially movment
 ##############################################################################
 class Action(object):
-    def __init__(self):
 
-        self.status = {
-        'up' : False,
-        'down' : False,
-        'right' : False,
-        'left' : False,
-        'running' : False
-        }
 
-    def check(self):
-        # check for keys and handle movement
+    def check(self, status):
+            # check for keys and handle movement
         for e in pygame.event.get():
             if e.type == QUIT: raise SystemExit, "QUIT"
-            
+
             if e.type == KEYDOWN and e.key == K_ESCAPE:
                 raise SystemExit, "ESCAPE"
             if e.type == KEYDOWN and (e.key == K_UP or e.key == K_j):
-                self.status['up'] = True
+                status['up'] = True
                 debug.printMsg('action is up')
             if e.type == KEYDOWN and e.key == K_DOWN:
-                self.status['down'] = True
+                status['down'] = True
                 debug.printMsg('action is down')
             if e.type == KEYDOWN and e.key == K_LEFT:
-                self.status['left'] = True
+                status['left'] = True
                 debug.printMsg('action is left')
             if e.type == KEYDOWN and e.key == K_RIGHT:
-                self.status['right'] = True
+                status['right'] = True
                 debug.printMsg('action is right')
             if e.type == KEYDOWN and e.key == K_SPACE:
-                self.status['running'] = True
+                status['running'] = True
                 debug.printMsg('action is running')
             if e.type == KEYUP and e.key == K_UP:
-                self.status['up'] = False
+                status['up'] = False
             if e.type == KEYUP and e.key == K_DOWN:
-                self.status['down'] = False
+                status['down'] = False
             if e.type == KEYUP and e.key == K_RIGHT:
-                self.status['right'] = False
+                status['right'] = False
             if e.type == KEYUP and e.key == K_LEFT:
-                self.status['left'] = False
+                status['left'] = False
             if e.type == KEYUP and e.key == K_RIGHT:
-                self.status['right'] = False
-
+                status['right'] = False
 
 ##############################################################################
 # Entity
@@ -213,39 +207,57 @@ class Entity(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
 ##############################################################################
-# Player
-# Takes care of players:
-# location/location
-# collision with platforms
-# TODO:
-# - health
+# Character
+# TODO 
+# Variables:
+# size
+# health
+
+# color
+# image
+#
+# speed
+# jump 
 ##############################################################################
-class Player(Entity):
-    def __init__(self, x, y):
+class Character(Entity):
+    def __init__(self, x, y, size, color, speed, jump):
         Entity.__init__(self)
         self.xvel = 0
         self.yvel = 0
         self.onGround = False
-        self.image = Surface((BLK_SIZE,BLK_SIZE))
-        self.image.fill(Color("#0000FF"))
-        self.image.convert()
-        self.rect = Rect(x, y, BLK_SIZE, BLK_SIZE)
+        self.speed = speed
+        self.jump = jump
 
-    def update(self, status, platforms):
-        if status['up']:                     # only jump if on the ground
-            if self.onGround: self.yvel -= 10
-        if status['down']:
+        dimension = size * BLK_SIZE
+
+        self.image = Surface((dimension,dimension))
+        self.image.fill(Color(color))
+        self.image.convert()
+        self.rect = Rect(x, y, dimension, dimension)
+
+        self.status = {
+                'up' : False,
+                'down' : False,
+                'right' : False,
+                'left' : False,
+                'running' : False
+                }
+
+    def updateLocation(self, platforms):
+        if self.status['up']:                     # only jump if on the ground
+            if self.onGround: self.yvel -= self.jump * 10
+        if self.status['down']:
             pass
-        if status['running']:
-            self.xvel = BLK_SIZE/2.66
-        if status['left']:
-            self.xvel = -BLK_SIZE/4
-        if status['right']:
-            self.xvel = BLK_SIZE/4
+        if self.status['running']:
+            self.xvel = self.speed * BLK_SIZE/2.66
+        if self.status['left']:
+            self.xvel = self.speed * -BLK_SIZE/4
+        if self.status['right']:
+            self.xvel = self.speed * BLK_SIZE/4
         if not self.onGround:                 # accelerate w/ gravity if in air
             self.yvel += BLK_SIZE/106.66      # max falling speed
             if self.yvel > BLK_SIZE*3: self.yvel = BLK_SIZE*3
-        if not(status['left'] or status['right']):
+        if not(self.status['left'] or self.status['right']):
             self.xvel = 0
         self.rect.left += self.xvel           # increment in x direction
         self.collide(self.xvel, 0, platforms) # do x-axis collisions
@@ -270,6 +282,24 @@ class Player(Entity):
                     self.rect.top = p.rect.bottom
 
 ##############################################################################
+# NonPlayer
+# TODO create AI
+# a
+##############################################################################
+class NonPlayer(Character):
+    def __init__(self, x, y):
+        Character.__init__(self, x, y, 1,  "#FF0000", 1 , 1)
+        
+
+##############################################################################
+# Player
+##############################################################################
+class Player(Character):
+    def __init__(self, x, y):
+        Character.__init__(self, x, y, 1,  "#0000FF", 1 , 1)
+        
+
+##############################################################################
 # Platform 
 # surfaces that make up the games terrain
 ##############################################################################
@@ -290,7 +320,16 @@ class Platform(Entity):
 class ExitBlock(Platform):
     def __init__(self, x, y):
         Platform.__init__(self, x, y)
-        self.image.fill(Color("#0033FF"))
+        self.image.fill(Color("#C0C0C0"))
+
+##############################################################################
+# Background
+##############################################################################
+class Background(Surface):
+    def __init__(self, color, width, height):
+       Surface.__init__(self, (width, height)) 
+       self.convert()
+       self.fill(Color(color))
 
 ##############################################################################
 # This runs main once every other function is defined

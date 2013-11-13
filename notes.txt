@@ -25,3 +25,16 @@ update ai
 
 Loop thought checking for collision with player
 - end game if the player is touched
+
+
+
+
+NPC notes
+=========
+NPCs should be able to hurt other npcs
+NPCs should be agressive tward other npcs
+
+
+NPC attributes
+==============
+
