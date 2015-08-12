@@ -1,6 +1,7 @@
 import pygame
 from pygame import *
 
+
 WIN_WIDTH = 800
 WIN_HEIGHT = int(WIN_WIDTH / 1.25)
 HALF_WIDTH = int(WIN_WIDTH / 2)
@@ -13,21 +14,21 @@ FLAGS = 0
 CAMERA_SLACK = 30
 
 class Debug(object):
-    enable = False 
+    enable = False
     def printHeader(self, txt):
         if self.enable:
-            print '=' * 80
-            print txt
-            print '-' * 80
+            print('=' * 80)
+            print(txt)
+            print('-' * 80)
     def printMsg(self, txt):
         if self.enable:
-            print txt
+            print(txt)
 debug = Debug()
 debug.enable = True
 
 
 ##############################################################################
-# Main 
+# Main
 # Includes initialization, and the main game loop
 ##############################################################################
 def main():
@@ -46,6 +47,11 @@ def main():
     player = Player(BLK_SIZE, BLK_SIZE)
     camera = Camera(map.width, map.height)
     entities.add(player)
+
+    npc = NonPlayer(BLK_SIZE + 20 ,BLK_SIZE + 20 )
+    entities.add(npc)
+
+
     while 1:
         timer.tick(60)
 
@@ -54,7 +60,9 @@ def main():
         map.draw(screen, bg)
 
         camera.update(player) # update player camera TODO needs better discription
-        player.updateLocation(map.platforms) 
+        player.updateLocation(map.platforms)
+        npc.updateLocation(map.platforms)
+        npc.follow(player)
 
         # draw everything with offset
         for e in entities:
@@ -80,7 +88,7 @@ class Camera(object):
         # _, _, w, h = camera # width, height of camera
         w = WIN_WIDTH
         h = WIN_HEIGHT
-        # center the camera on the target 
+        # center the camera on the target
         return Rect(-l+HALF_WIDTH, -t+HALF_HEIGHT, w, h)
 
     #TODO: integrate into class
@@ -97,7 +105,7 @@ class Camera(object):
 
 ##############################################################################
 # Map
-# contains text map 
+# contains text map
 # method to build the map out of platforms
 # method to redraw map
 ##############################################################################
@@ -138,8 +146,8 @@ class Map(object):
         self.height = len(self.level)*BLK_SIZE
 
     def draw(self, screen, background):
-        for self.y in range(WIN_HEIGHT/BLK_SIZE):
-            for self.x in range(WIN_WIDTH/BLK_SIZE):
+        for self.y in range(WIN_HEIGHT//BLK_SIZE):
+            for self.x in range(WIN_WIDTH//BLK_SIZE):
                 screen.blit(background, (self.x * BLK_SIZE, self.y * BLK_SIZE))
 
     def build(self, entities):
@@ -168,13 +176,13 @@ class Action(object):
     def check(self, status):
             # check for keys and handle movement
         for e in pygame.event.get():
-            if e.type == QUIT: raise SystemExit, "QUIT"
-
+            if e.type == QUIT:
+                raise SystemExit("QUIT")
             if e.type == KEYDOWN and e.key == K_ESCAPE:
-                raise SystemExit, "ESCAPE"
+                raise SystemExit("ESCAPE")
             if e.type == KEYDOWN and (e.key == K_UP or e.key == K_j):
                 status['up'] = True
-                debug.printMsg('action is up')
+                debug.printMsg((('action is up')))
             if e.type == KEYDOWN and e.key == K_DOWN:
                 status['down'] = True
                 debug.printMsg('action is down')
@@ -208,7 +216,7 @@ class Entity(pygame.sprite.Sprite):
 
 ##############################################################################
 # Character
-# TODO 
+# TODO
 # Variables:
 # size
 # health
@@ -217,7 +225,7 @@ class Entity(pygame.sprite.Sprite):
 # image
 #
 # speed
-# jump 
+# jump
 ##############################################################################
 class Character(Entity):
     def __init__(self, x, y, size, color, speed, jump):
@@ -283,13 +291,40 @@ class Character(Entity):
 
 ##############################################################################
 # NonPlayer
-# TODO create AI
-# a
 ##############################################################################
 class NonPlayer(Character):
     def __init__(self, x, y):
-        Character.__init__(self, x, y, 1,  "#FF0000", 1 , 1)
-        
+        speed = 0.25
+        jump = 1
+        size = 3
+        color = "#FF0000"
+        Character.__init__(self, x, y, size,  color, speed , jump)
+
+    def follow(self, target):
+
+        target_x , target_y = target.rect.center
+        x , y = self.rect.center
+
+        if target_x < x: #t   n tpos < npos to the left of npc
+            self.status["right"] = False
+            self.status["left"] = True
+
+        if target_x > x : #n   t tpos > npos: to the right of npc
+            self.status["right"] = True
+            self.status["left"] = False
+
+        if  target_x == x:  # don't move when x is inline x_targ
+            self.status["right"] = False
+            self.status["left"] = False
+
+        if target_y < y: #above
+            self.status["up"] = True
+
+        if target_y > y: #bellow
+            self.status["up"] = False
+
+        if target_y == y: # same level
+            self.status["up"] = False
 
 ##############################################################################
 # Player
@@ -297,10 +332,10 @@ class NonPlayer(Character):
 class Player(Character):
     def __init__(self, x, y):
         Character.__init__(self, x, y, 1,  "#0000FF", 1 , 1)
-        
+
 
 ##############################################################################
-# Platform 
+# Platform
 # surfaces that make up the games terrain
 ##############################################################################
 class Platform(Entity):
@@ -314,7 +349,7 @@ class Platform(Entity):
         pass
 
 ##############################################################################
-# Exitblock 
+# Exitblock
 # surface when touched ends the game
 ##############################################################################
 class ExitBlock(Platform):
@@ -327,7 +362,7 @@ class ExitBlock(Platform):
 ##############################################################################
 class Background(Surface):
     def __init__(self, color, width, height):
-       Surface.__init__(self, (width, height)) 
+       Surface.__init__(self, (width, height))
        self.convert()
        self.fill(Color(color))
 
