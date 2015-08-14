@@ -32,7 +32,10 @@ Loop thought checking for collision with player
 NPC notes
 =========
 NPCs should be able to hurt other npcs
-NPCs should be agressive tward other npcs
+NPCs should be aggressive toward other npcs
+
+
+NPCs should be blotted out of existence when they are too far away
 
 
 NPC attributes
