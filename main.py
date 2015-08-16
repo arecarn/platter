@@ -9,54 +9,48 @@ import map_gen
 import actions
 
 
-
-
 ##############################################################################
 # Main
 # Includes initialization, and the main game loop
 ##############################################################################
 def main():
     pygame.init()
-    screen = pygame.display.set_mode(settings.DISPLAY, settings.FLAGS, settings.DEPTH)
     pygame.display.set_caption("Use arrows to move!")
     timer = pygame.time.Clock()
     entities = pygame.sprite.Group()
+    players = []
+    npcs = []
+
+    screen = pygame.display.set_mode(settings.DISPLAY, settings.FLAGS, settings.DEPTH)
+    background = game_objects.Background("#000000", settings.BLK_SIZE, settings.BLK_SIZE)
 
     map = map_gen.Map(level._1)
-    map.build(entities)
+    map.build(entities, players, npcs)
+    game_camera = camera.Camera(map.width, map.height)
 
     action = actions.Action()
 
-    # TODO: move this to it's own class?
-    bg = game_objects.Background("#000000", settings.BLK_SIZE, settings.BLK_SIZE)
+    player = players[0]
 
-    cam = camera.Camera(map.width, map.height)
-
-    player = characters.Player(settings.BLK_SIZE, settings.BLK_SIZE)
-    characters.Player(settings.BLK_SIZE, settings.BLK_SIZE)
-    entities.add(player)
-
-    npc = characters.NonPlayer(settings.BLK_SIZE + 20 ,settings.BLK_SIZE + 20 )
-    entities.add(npc)
 
     while 1:
         timer.tick(60)
 
-        action.check(player.status) # check for events
+        action.check(player.status)
 
-        map.draw(screen, bg)
-
-        cam.update(player) # update player camera TODO needs better discription
         player.updateLocation(map.platforms)
-        npc.updateLocation(map.platforms)
-        npc.follow(player)
+        for npc in npcs:
+            npc.updateLocation(map.platforms)
+            npc.follow(player)
+
+        game_camera.update(player)
+        map.draw(screen, background)
 
         # draw everything with offset
         for e in entities:
-            screen.blit(e.image, cam.apply(e)) # update entities with of set Camera
+            screen.blit(e.image, game_camera.apply(e))
+
         pygame.display.update()
-
-
 
 
 ##############################################################################
