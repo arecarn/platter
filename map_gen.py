@@ -1,6 +1,7 @@
 import settings
 import characters
 import game_objects
+import pygame
 
 ##############################################################################
 # Map
@@ -14,16 +15,36 @@ class Map(object):
         self.platforms = []
         self.x = 0
         self.y = 0
+
+        self.entities = pygame.sprite.Group()
         # TODO mode map into separate files
         self.width  = len(self.level[0])*settings.BLK_SIZE
         self.height = len(self.level)*settings.BLK_SIZE
+        self.screen = pygame.display.set_mode(
+            settings.DISPLAY,
+            settings.FLAGS,
+            settings.DEPTH
+        )
+        self.background = game_objects.Background(
+            "#000000",
+            settings.BLK_SIZE,
+            settings.BLK_SIZE
+        )
 
-    def draw(self, screen, background):
-        for self.y in range(settings.WIN_HEIGHT//settings.BLK_SIZE):
-            for self.x in range(settings.WIN_WIDTH//settings.BLK_SIZE):
-                screen.blit(background, (self.x * settings.BLK_SIZE, self.y * settings.BLK_SIZE))
+    def draw(self, offset):
 
-    def build(self, entities, players, npcs):
+        for self.y in range(settings.WIN_HEIGHT // settings.BLK_SIZE):
+            for self.x in range(settings.WIN_WIDTH // settings.BLK_SIZE):
+                self.screen.blit(
+                        self.background,
+                        (self.x * settings.BLK_SIZE, self.y * settings.BLK_SIZE)
+                    )
+        for entity in self.entities:
+            self.screen.blit(entity.image, offset(entity))
+
+
+
+    def build(self, players, npcs):
         # build the level
 
         for row_number, row in enumerate(self.level):
@@ -31,21 +52,21 @@ class Map(object):
                 if col == "P":
                     p = game_objects.Platform(self.x, self.y)
                     self.platforms.append(p)
-                    entities.add(p)
+                    self.entities.add(p)
 
                 if col == "E":
                     e = game_objects.ExitBlock(self.x, self.y)
                     self.platforms.append(e)
-                    entities.add(e)
+                    self.entities.add(e)
 
                 if col == "C":
                     player = characters.Player(self.x, self.y)
-                    entities.add(player)
+                    self.entities.add(player)
                     players.append(player)
 
                 if col == "N":
                     npc = characters.NonPlayer(self.x, self.y)
-                    entities.add(npc)
+                    self.entities.add(npc)
                     npcs.append(npc)
 
                 self.x += settings.BLK_SIZE

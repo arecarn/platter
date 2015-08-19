@@ -17,19 +17,13 @@ def main():
     pygame.init()
     pygame.display.set_caption("Use arrows to move!")
     timer = pygame.time.Clock()
-    entities = pygame.sprite.Group()
+
     players = []
     npcs = []
-
-    screen = pygame.display.set_mode(settings.DISPLAY, settings.FLAGS, settings.DEPTH)
-    background = game_objects.Background("#000000", settings.BLK_SIZE, settings.BLK_SIZE)
-
     map = map_gen.Map(level._1)
-    map.build(entities, players, npcs)
+    map.build(players, npcs)
     game_camera = camera.Camera(map.width, map.height)
-
     action = actions.Action()
-
     player = players[0]
 
 
@@ -37,21 +31,15 @@ def main():
         timer.tick(60)
 
         action.check(player.status)
-
         player.updateLocation(map.platforms)
+
         for npc in npcs:
             npc.updateLocation(map.platforms)
             npc.follow(player)
 
         game_camera.update(player)
-        map.draw(screen, background)
-
-        # draw everything with offset
-        for e in entities:
-            screen.blit(e.image, game_camera.apply(e))
-
+        map.draw(offset=game_camera.apply)
         pygame.display.update()
-
 
 ##############################################################################
 # This runs main once every other function is defined
