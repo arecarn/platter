@@ -26,7 +26,7 @@ class Map(object):
             settings.DEPTH
         )
         self.background = game_objects.Background(
-            "#000000",
+            settings.BACKGROUND_COLOR,
             settings.BLK_SIZE,
             settings.BLK_SIZE
         )
@@ -49,23 +49,40 @@ class Map(object):
 
         for row_number, row in enumerate(self.level):
             for col_number, col in enumerate(row):
+
                 if col == "P":
-                    p = game_objects.Platform(self.x, self.y)
-                    self.platforms.append(p)
-                    self.entities.add(p)
+                    platform = game_objects.Platform(
+                        self.x,
+                        self.y,
+                        settings.PLATFORM_COLOR
+                    )
+                    self.platforms.append(platform)
+                    self.entities.add(platform)
 
                 if col == "E":
-                    e = game_objects.ExitBlock(self.x, self.y)
-                    self.platforms.append(e)
-                    self.entities.add(e)
+                    exit_block = game_objects.ExitBlock(
+                        self.x,
+                        self.y,
+                        settings.EXIT_BLOCK_COLOR
+                    )
+                    self.platforms.append(exit_block)
+                    self.entities.add(exit_block)
 
                 if col == "C":
-                    player = characters.Player(self.x, self.y)
+                    player = characters.Player(
+                        self.x,
+                        self.y,
+                        settings.CHARACTER_COLOR
+                    )
                     self.entities.add(player)
                     players.append(player)
 
                 if col == "N":
-                    npc = characters.NonPlayer(self.x, self.y)
+                    npc = characters.NonPlayer(
+                            self.x,
+                            self.y,
+                            settings.NPC_COLOR
+                    )
                     self.entities.add(npc)
                     npcs.append(npc)
 

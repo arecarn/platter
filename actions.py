@@ -22,6 +22,7 @@ class Action(object):
     def check(self, status):
             # check for keys and handle movement
         for e in pygame.event.get():
+
             if e.type == pygame.QUIT:
                 raise SystemExit("QUIT")
 

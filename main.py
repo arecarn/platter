@@ -16,16 +16,17 @@ import actions
 def main():
     pygame.init()
     pygame.display.set_caption("Use arrows to move!")
-    timer = pygame.time.Clock()
 
     players = []
     npcs = []
     map = map_gen.Map(level._1)
     map.build(players, npcs)
-    game_camera = camera.Camera(map.width, map.height)
-    action = actions.Action()
     player = players[0]
+    game_camera = camera.Camera(map.width, map.height)
 
+    action = actions.Action()
+
+    timer = pygame.time.Clock()
 
     while 1:
         timer.tick(60)

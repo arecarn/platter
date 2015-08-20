@@ -96,19 +96,29 @@ class _Character(entity.Entity):
 # Player
 ##############################################################################
 class Player(_Character):
-    def __init__(self, x, y):
-        super().__init__(x, y, 1,  "#0000FF", 1 , 1)
+    def __init__(self, x, y, color):
+        super().__init__(
+            x,
+            y,
+            size = 1,
+            color = color,
+            speed = 1,
+            jump = 1
+        )
 
 ##############################################################################
 # NonPlayer
 ##############################################################################
 class NonPlayer(_Character):
-    def __init__(self, x, y):
-        speed = 0.25
-        jump = 1
-        size = 3
-        color = "#FF0000"
-        super().__init__(x, y, size,  color, speed , jump)
+    def __init__(self, x, y, color):
+        super().__init__(
+            x,
+            y,
+            size = 2,
+            color = color,
+            speed = 0.25,
+            jump = 0.8
+        )
 
     def follow(self, target):
 
