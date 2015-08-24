@@ -13,10 +13,9 @@ class Map(object):
     def __init__(self, level):
         self.level = level
         self.platforms = []
-        self.x = 0
-        self.y = 0
 
         self.entities = pygame.sprite.Group()
+
         # TODO mode map into separate files
         self.width  = len(self.level[0])*settings.BLK_SIZE
         self.height = len(self.level)*settings.BLK_SIZE
@@ -31,29 +30,31 @@ class Map(object):
             settings.BLK_SIZE
         )
 
-    def draw(self, offset):
 
-        for self.y in range(settings.WIN_HEIGHT // settings.BLK_SIZE):
-            for self.x in range(settings.WIN_WIDTH // settings.BLK_SIZE):
+    def draw(self, offset):
+        for y in range(settings.WIN_HEIGHT // settings.BLK_SIZE):
+            for x in range(settings.WIN_WIDTH // settings.BLK_SIZE):
                 self.screen.blit(
                         self.background,
-                        (self.x * settings.BLK_SIZE, self.y * settings.BLK_SIZE)
+                        (x * settings.BLK_SIZE, y * settings.BLK_SIZE)
                     )
         for entity in self.entities:
             self.screen.blit(entity.image, offset(entity))
 
 
 
-    def build(self, players, npcs):
+    def build(self, npcs):
         # build the level
+        x = 0
+        y = 0
 
         for row_number, row in enumerate(self.level):
             for col_number, col in enumerate(row):
 
                 if col == "P":
                     platform = game_objects.Platform(
-                        self.x,
-                        self.y,
+                        x,
+                        y,
                         settings.PLATFORM_COLOR
                     )
                     self.platforms.append(platform)
@@ -61,31 +62,30 @@ class Map(object):
 
                 if col == "E":
                     exit_block = game_objects.ExitBlock(
-                        self.x,
-                        self.y,
+                        x,
+                        y,
                         settings.EXIT_BLOCK_COLOR
                     )
                     self.platforms.append(exit_block)
                     self.entities.add(exit_block)
 
                 if col == "C":
-                    player = characters.Player(
-                        self.x,
-                        self.y,
-                        settings.CHARACTER_COLOR
-                    )
-                    self.entities.add(player)
-                    players.append(player)
+                    characters.player.set_pos(x, y)
+                    characters.player.set_color(settings.CHARACTER_COLOR)
+                    self.entities.add(characters.player)
 
                 if col == "N":
                     npc = characters.NonPlayer(
-                            self.x,
-                            self.y,
+                            x,
+                            y,
                             settings.NPC_COLOR
                     )
                     self.entities.add(npc)
                     npcs.append(npc)
 
-                self.x += settings.BLK_SIZE
-            self.y += settings.BLK_SIZE
-            self.x = 0
+                x += settings.BLK_SIZE
+            y += settings.BLK_SIZE
+            x = 0
+
+            for entity in self.entities:
+                entity.image.convert()

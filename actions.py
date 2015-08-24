@@ -1,65 +1,63 @@
 import pygame
+import characters
 
-class Debug(object):
-    enable = False
-    def printHeader(self, txt):
-        if self.enable:
-            print('=' * 80)
-            print(txt)
-            print('-' * 80)
-    def printMsg(self, txt):
-        if self.enable:
-            print(txt)
-debug = Debug()
-debug.enable = True
 
-##############################################################################
-# Action
-# Handles keyboard events/ especially movment
-##############################################################################
+def do_nothing(__):
+    pass
+
+def do_raise(exception):
+    raise(exception)
+
 class Action(object):
+    def __init__(self):
+        self.keyboard_event = {
 
-    def check(self, status):
-            # check for keys and handle movement
-        for e in pygame.event.get():
+            pygame.K_UP : {
+                pygame.KEYDOWN : characters.player.go_up,
+                pygame.KEYUP   : characters.player.stop_go_up,
+                },
 
-            if e.type == pygame.QUIT:
-                raise SystemExit("QUIT")
+            pygame.K_DOWN : {
+                pygame.KEYDOWN : characters.player.go_down,
+                pygame.KEYUP   : characters.player.stop_go_down,
+                },
 
-            if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
-                raise SystemExit("ESCAPE")
+            pygame.K_LEFT : {
+                pygame.KEYDOWN : characters.player.go_left,
+                pygame.KEYUP   : characters.player.stop_go_left,
+                },
 
-            if e.type == pygame.KEYDOWN and (e.key == pygame.K_UP or e.key == pygame.K_j):
-                status['up'] = True
-                debug.printMsg((('action is up')))
+            pygame.K_RIGHT : {
+                pygame.KEYDOWN : characters.player.go_right,
+                pygame.KEYUP   : characters.player.stop_go_right,
+                },
 
-            if e.type == pygame.KEYDOWN and e.key == pygame.K_DOWN:
-                status['down'] = True
-                debug.printMsg('action is down')
+            pygame.K_SPACE : {
+                pygame.KEYDOWN : characters.player.run,
+                pygame.KEYUP   : characters.player.stop_run,
+            },
 
-            if e.type == pygame.KEYDOWN and e.key == pygame.K_LEFT:
-                status['left'] = True
-                debug.printMsg('action is left')
+            pygame.K_ESCAPE: {
+                pygame.KEYDOWN : exit,
+                pygame.KEYUP   : exit,
+            },
+        }
 
-            if e.type == pygame.KEYDOWN and e.key == pygame.K_RIGHT:
-                status['right'] = True
-                debug.printMsg('action is right')
+    def handle_keyboard_events(self, event):
+        if is_keyboard_event(self, event):
+            keyHandler = self.keyboard_event[event.key][event.type]()
 
-            if e.type == pygame.KEYDOWN and e.key == pygame.K_SPACE:
-                status['running'] = True
-                debug.printMsg('action is running')
+    def check(self, player):
+        for event in pygame.event.get():
+            handle_keyboard_events(self, event)
 
-            if e.type == pygame.KEYUP and e.key == pygame.K_UP:
-                status['up'] = False
+    def is_keyboard_event(self, event):
+        return ((event.type == pygame.KEYDOWN or
+                event.type == pygame.KEYUP) and
+                event.key in self.keyboard_event.keys())
 
-            if e.type == pygame.KEYUP and e.key == pygame.K_DOWN:
-                status['down'] = False
 
-            if e.type == pygame.KEYUP and e.key == pygame.K_RIGHT:
-                status['right'] = False
+def exit():
+    raise SystemExit()
 
-            if e.type == pygame.KEYUP and e.key == pygame.K_LEFT:
-                status['left'] = False
 
-            if e.type == pygame.KEYUP and e.key == pygame.K_RIGHT:
-                status['right'] = False
