@@ -13,9 +13,8 @@ def main():
     pygame.init()
     pygame.display.set_caption("Use arrows to move!")
 
-    npcs = []
     map = map_gen.Map(level._1)
-    map.build(npcs)
+    map.build()
     game_camera = camera.Camera(map.width, map.height)
 
     action = actions.Action()
@@ -28,7 +27,7 @@ def main():
         action.check(characters.player)
         characters.player.updateLocation(map.platforms)
 
-        for npc in npcs:
+        for npc in characters.npcs:
             npc.updateLocation(map.platforms)
             npc.follow(characters.player)
 

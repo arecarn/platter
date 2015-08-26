@@ -43,18 +43,19 @@ class Action(object):
             },
         }
 
-    def handle_keyboard_events(self, event):
-        if is_keyboard_event(self, event):
-            keyHandler = self.keyboard_event[event.key][event.type]()
-
-    def check(self, player):
-        for event in pygame.event.get():
-            handle_keyboard_events(self, event)
-
     def is_keyboard_event(self, event):
         return ((event.type == pygame.KEYDOWN or
                 event.type == pygame.KEYUP) and
                 event.key in self.keyboard_event.keys())
+
+    def handle_keyboard_events(self, event):
+        if self.is_keyboard_event(event):
+            keyHandler = self.keyboard_event[event.key][event.type]()
+
+    def check(self, player):
+        for event in pygame.event.get():
+            self.handle_keyboard_events(event)
+
 
 
 def exit():

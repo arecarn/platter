@@ -43,8 +43,7 @@ class Map(object):
 
 
 
-    def build(self, npcs):
-        # build the level
+    def build(self):
         x = 0
         y = 0
 
@@ -76,12 +75,12 @@ class Map(object):
 
                 if col == "N":
                     npc = characters.NonPlayer(
-                            x,
-                            y,
-                            settings.NPC_COLOR
+                        x,
+                        y,
+                        settings.NPC_COLOR
                     )
                     self.entities.add(npc)
-                    npcs.append(npc)
+                    characters.npcs.append(npc)
 
                 x += settings.BLK_SIZE
             y += settings.BLK_SIZE
