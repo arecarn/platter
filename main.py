@@ -18,6 +18,7 @@ def main():
     game_camera = camera.Camera(map.width, map.height)
 
     action = actions.Action()
+    action.set_player(characters.player)
 
     timer = pygame.time.Clock()
 
@@ -25,10 +26,10 @@ def main():
         timer.tick(60)
 
         action.check(characters.player)
-        characters.player.update_location(map.entities)
+        characters.player.update(map.entities)
 
-        for npc in characters.npcs:
-            npc.follow(characters.player)
+        # for npc in characters.npcs:
+        #     npc.follow(characters.player)
 
         # for entity in map.entities:
         #     entity.update_location(map.entities)

@@ -22,38 +22,19 @@ class Character(entity.Entity):
 
         self.x_velocity = 0
         self.y_velocity = 0
-        self.onGround = False
         self.speed = speed
 
         self.going_up = False
         self.going_down = False
         self.going_right = False
         self.going_left  =  False
-        self.running = False
 
-    def update_location(self, entities):
-        if self.going_up:
-            self.y_velocity = self.speed * -settings.CHARACTER_WALK_SPEED
-
-        if self.going_down:
-            self.y_velocity = self.speed * settings.CHARACTER_WALK_SPEED
-
-        if self.going_left:
-            self.x_velocity = self.speed * -settings.CHARACTER_WALK_SPEED
-
-        if self.going_right:
-            self.x_velocity = self.speed * settings.CHARACTER_WALK_SPEED
-
-        if self.running:
-            self.x_velocity = self.x_velocity * 3
-
-        if not(self.going_right or self.going_left):
-            self.x_velocity = 0
-
-        if not(self.going_up or self.going_down):
-            self.y_velocity = 0
-
+    def update(self, entities):
         self.collide(self.x_velocity, self.y_velocity, entities) # do x-axis collisions
+        self.handleActions()
+
+    def handleActions(self):
+        pass
 
 
     def collide(self, x_velocity, y_velocity, entities):
@@ -75,17 +56,33 @@ class Character(entity.Entity):
 
                     if y_velocity > 0:
                         self.rect.bottom = entity.rect.top
-                        self.onGround = True
                         self.y_velocity = 0
 
                     if y_velocity < 0:
                         self.rect.top = entity.rect.bottom
                         self.y_velocity = 0
 
+    def go_up(self):
+        self.y_velocity = self.speed * -settings.CHARACTER_WALK_SPEED
+
+    def go_down(self) :
+        self.y_velocity = self.speed * settings.CHARACTER_WALK_SPEED
+
+    def go_left(self):
+        self.x_velocity = self.speed * -settings.CHARACTER_WALK_SPEED
+
+    def go_right(self):
+        self.x_velocity = self.speed * settings.CHARACTER_WALK_SPEED
+
+    def stop_x(self):
+        self.x_velocity = 0
+
+    def stop_y(self):
+        self.y_velocity = 0
+
 class Player(Character):
     def __init__(self, x, y, color):
-        Character.__init__(
-            self,
+        super().__init__(
             x,
             y,
             size = 1,
@@ -93,42 +90,12 @@ class Player(Character):
             speed = 1,
         )
 
-    def go_up(self):
-        self.going_up = True
-
-    def stop_go_up(self):
-        self.going_up = False
-
-    def go_down(self) :
-        self.going_down = True
-
-    def stop_go_down(self) :
-        self.going_down = False
-
-    def go_left(self):
-        self.going_left = True
-
-    def stop_go_left(self):
-        self.going_left = False
-
-    def go_right(self):
-        self.going_right = True
-
-    def stop_go_right(self):
-        self.going_right = False
-
-    def run(self):
-        self.running = True
-
-    def stop_run(self):
-        player.running = False
 
 
 
 class NonPlayer(Character):
     def __init__(self, x, y, color):
-        Character.__init__(
-            self,
+        super().__init__(
             x,
             y,
             size = 2,
