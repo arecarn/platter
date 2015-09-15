@@ -6,18 +6,18 @@ import game_objects
 
 class Character(entity.Entity):
     def __init__(
-        self, 
-        x, 
-        y, 
-        size, 
-        color, 
-        speed, 
+        self,
+        x,
+        y,
+        size,
+        color,
+        speed,
         jump
     ):
         entity.Entity.__init__(
-                self, 
-                x, 
-                y, 
+                self,
+                x,
+                y,
                 color
             )
 
@@ -33,7 +33,7 @@ class Character(entity.Entity):
         self.going_left  =  False
         self.running = False
 
-    def updateLocation(self, platforms):
+    def update_location(self, entities):
         if self.going_up:
             if self.onGround:
                 self.y_velocity -= self.jump * settings.CHARACTER_JUMP_SPEED
@@ -58,35 +58,35 @@ class Character(entity.Entity):
         if not(self.going_left or self.going_right):
             self.x_velocity = 0
 
+        self.onGround = False;                      # assuming we're in the air
+        self.collide(self.x_velocity, self.y_velocity, entities) # do x-axis collisions
+
+
+    def collide(self, x_velocity, y_velocity, entities):
         self.rect.left += self.x_velocity           # increment in x direction
-        self.collide(self.x_velocity, 0, platforms) # do x-axis collisions
+        for entity in entities:
+            if isinstance(entity, game_objects.Platform):
+                if pygame.sprite.collide_rect(self, entity):
+
+                    if x_velocity > 0:
+                        self.rect.right = entity.rect.left
+
+                    if x_velocity < 0:
+                        self.rect.left = entity.rect.right
 
         self.rect.top += self.y_velocity            # increment in y direction
-        self.onGround = False;                      # assuming we're in the air
-        self.collide(0, self.y_velocity, platforms) # do y-axis collisions
+        for entity in entities:
+            if isinstance(entity, game_objects.Platform):
+                if pygame.sprite.collide_rect(self, entity):
 
+                    if y_velocity > 0:
+                        self.rect.bottom = entity.rect.top
+                        self.onGround = True
+                        self.y_velocity = 0
 
-    def collide(self, x_velocity, y_velocity, platforms):
-        for platform in platforms:
-
-            if pygame.sprite.collide_rect(self, platform):
-                if isinstance(platform, game_objects.ExitBlock):
-                    pygame.event.post(pygame.event.Event(pygame.QUIT))
-
-                if x_velocity > 0:
-                    self.rect.right = platform.rect.left # print "collide right"
-
-                if x_velocity < 0:
-                    self.rect.left = platform.rect.right # print "collide left"
-
-                if y_velocity > 0:
-                    self.rect.bottom = platform.rect.top
-                    self.onGround = True
-                    self.y_velocity = 0
-
-                if y_velocity < 0:
-                    self.rect.top = platform.rect.bottom
-                    self.y_velocity = 0
+                    if y_velocity < 0:
+                        self.rect.top = entity.rect.bottom
+                        self.y_velocity = 0
 
 class Player(Character):
     def __init__(self, x, y, color):

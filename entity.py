@@ -1,11 +1,9 @@
 import pygame
 import settings
 
-##############################################################################
-# Entity
-# create a sprite
-##############################################################################
+
 class Entity(pygame.sprite.Sprite):
+
     def __init__(self, x, y, color):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((settings.BLK_SIZE, settings.BLK_SIZE))
@@ -18,4 +16,16 @@ class Entity(pygame.sprite.Sprite):
 
     def set_color(self, color):
         self.image.fill(pygame.Color(color))
+
+    def update_location(self, entities):
+        pass
+
+
+    def collide(self, entities):
+        self.collide_action()
+        pass
+
+    def collide_action(self):
+        pass
+
 

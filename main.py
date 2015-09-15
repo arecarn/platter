@@ -25,11 +25,13 @@ def main():
         timer.tick(60)
 
         action.check(characters.player)
-        characters.player.updateLocation(map.platforms)
+        characters.player.update_location(map.entities)
 
         for npc in characters.npcs:
-            npc.updateLocation(map.platforms)
             npc.follow(characters.player)
+
+        # for entity in map.entities:
+        #     entity.update_location(map.entities)
 
         game_camera.update(characters.player)
         map.draw(offset=game_camera.apply)

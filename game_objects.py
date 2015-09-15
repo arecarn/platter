@@ -5,13 +5,9 @@ class Platform(entity.Entity):
     def __init__(self, x, y, color):
         entity.Entity.__init__(self, x, y, color)
 
-    def update(self):
-        pass
-
 class ExitBlock(Platform):
     def __init__(self, x, y, color):
         Platform.__init__(self, x, y, color)
-        self.image.fill(pygame.Color(color))
 
 class Background(pygame.Surface):
     def __init__(self, color, width, height):
