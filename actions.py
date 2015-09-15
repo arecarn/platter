@@ -1,13 +1,6 @@
 import pygame
 import characters
 
-
-def do_nothing(__):
-    pass
-
-def do_raise(exception):
-    raise(exception)
-
 class Action(object):
     def __init__(self):
         self.keyboard_event = {
@@ -34,7 +27,7 @@ class Action(object):
 
             pygame.K_ESCAPE: {
                 pygame.KEYDOWN : Exit,
-                pygame.KEYUP   : Exit,
+                pygame.KEYUP   : DoNothing,
             },
         }
 
@@ -60,15 +53,18 @@ class Command(object):
         pass
 
 
+class DoNothing(Command):
+    def __init__(self):
+        super().__init__()
+
+    def execute(self):
+        pass
+
+
 class CharacterCommand(Command):
     def __init__(self, character):
         Command().__init__()
         self.character = character
-
-
-class InterfaceCommand(Command):
-    def __init__(self):
-        pass
 
 
 class GoUp(CharacterCommand):
@@ -85,6 +81,7 @@ class GoDown(CharacterCommand):
 
     def execute(self):
         self.character.go_down()
+
 
 class GoLeft(CharacterCommand):
     def __init__(self, character):
@@ -114,6 +111,11 @@ class StopY(CharacterCommand):
 
     def execute(self):
         self.character.stop_y()
+
+
+class InterfaceCommand(Command):
+    def __init__(self):
+        pass
 
 
 class Exit(InterfaceCommand):
