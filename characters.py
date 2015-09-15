@@ -12,7 +12,6 @@ class Character(entity.Entity):
         size,
         color,
         speed,
-        jump
     ):
         entity.Entity.__init__(
                 self,
@@ -25,7 +24,6 @@ class Character(entity.Entity):
         self.y_velocity = 0
         self.onGround = False
         self.speed = speed
-        self.jump = jump
 
         self.going_up = False
         self.going_down = False
@@ -35,11 +33,10 @@ class Character(entity.Entity):
 
     def update_location(self, entities):
         if self.going_up:
-            if self.onGround:
-                self.y_velocity -= self.jump * settings.CHARACTER_JUMP_SPEED
+            self.y_velocity = self.speed * -settings.CHARACTER_WALK_SPEED
 
         if self.going_down:
-            pass
+            self.y_velocity = self.speed * settings.CHARACTER_WALK_SPEED
 
         if self.going_left:
             self.x_velocity = self.speed * -settings.CHARACTER_WALK_SPEED
@@ -50,15 +47,12 @@ class Character(entity.Entity):
         if self.running:
             self.x_velocity = self.x_velocity * 3
 
-        if not self.onGround:
-            self.y_velocity += settings.FALLING_ACCELERATION
-            if self.y_velocity > settings.TERMINAL_VELOCITY:
-                self.y_velocity = settings.TERMINAL_VELOCITY
-
-        if not(self.going_left or self.going_right):
+        if not(self.going_right or self.going_left):
             self.x_velocity = 0
 
-        self.onGround = False;                      # assuming we're in the air
+        if not(self.going_up or self.going_down):
+            self.y_velocity = 0
+
         self.collide(self.x_velocity, self.y_velocity, entities) # do x-axis collisions
 
 
@@ -97,7 +91,6 @@ class Player(Character):
             size = 1,
             color = color,
             speed = 1,
-            jump = 1
         )
 
     def go_up(self):
@@ -141,7 +134,6 @@ class NonPlayer(Character):
             size = 2,
             color = color,
             speed = 0.25,
-            jump = 0.8
         )
 
     # TODO make this a "Behavior" and mode it to that class
