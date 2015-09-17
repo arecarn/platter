@@ -2,6 +2,7 @@ import pygame
 import entity
 import settings
 import game_objects
+import actions
 
 
 class Character(entity.Entity):
@@ -23,11 +24,6 @@ class Character(entity.Entity):
         self.x_velocity = 0
         self.y_velocity = 0
         self.speed = speed
-
-        self.going_up = False
-        self.going_down = False
-        self.going_right = False
-        self.going_left  =  False
 
     def update(self, entities):
         self.rect.left += self.x_velocity
@@ -109,25 +105,16 @@ class NonPlayer(Character):
         x , y = self.rect.center
 
         if target_x < x: #t   n tpos < npos to the left of npc
-            self.going_right = False
-            self.going_left = True
+            actions.GoLeft(self).execute()
 
         if target_x > x : #n   t tpos > npos: to the right of npc
-            self.going_right = True
-            self.going_left = False
-
-        if  target_x == x:  # don't move when x is inline x_targ
-            self.going_right = False
-            self.going_left = False
+            actions.GoRight(self).execute()
 
         if target_y < y: #above
-            self.going_up = True
+            actions.GoUp(self).execute()
 
         if target_y > y: #bellow
-            self.going_up = False
-
-        if target_y == y: # same level
-            self.going_up = False
+            actions.GoDown(self).execute()
 
 
 player = Player(0 , 0 , settings.CHARACTER_COLOR)
