@@ -32,7 +32,7 @@ class Character(entity.Entity):
         self.collide_y(entities)
         self.do_behavior()
 
-    def handleActions(self):
+    def do_behavior(self):
         pass
 
     def collide_x(self, entities):
@@ -97,6 +97,9 @@ class NonPlayer(Character):
             color = color,
             speed = 0.25,
         )
+
+    def do_behavior(self):
+        self.follow(player)
 
     # TODO make this a "Behavior" and mode it to that class
     def follow(self, target):
