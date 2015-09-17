@@ -30,35 +30,36 @@ class Character(entity.Entity):
         self.going_left  =  False
 
     def update(self, entities):
-        self.collide(self.x_velocity, self.y_velocity, entities) # do x-axis collisions
-        self.handleActions()
+        self.rect.left += self.x_velocity
+        self.collide_x(entities)
+        self.rect.top += self.y_velocity
+        self.collide_y(entities)
+        self.do_behavior()
 
     def handleActions(self):
         pass
 
-
-    def collide(self, x_velocity, y_velocity, entities):
-        self.rect.left += self.x_velocity           # increment in x direction
+    def collide_x(self, entities):
         for entity in entities:
             if isinstance(entity, game_objects.Platform):
                 if pygame.sprite.collide_rect(self, entity):
 
-                    if x_velocity > 0:
+                    if self.x_velocity > 0:
                         self.rect.right = entity.rect.left
 
-                    if x_velocity < 0:
+                    if self.x_velocity < 0:
                         self.rect.left = entity.rect.right
 
-        self.rect.top += self.y_velocity            # increment in y direction
+    def collide_y(self, entities):
         for entity in entities:
             if isinstance(entity, game_objects.Platform):
                 if pygame.sprite.collide_rect(self, entity):
 
-                    if y_velocity > 0:
+                    if self.y_velocity > 0:
                         self.rect.bottom = entity.rect.top
                         self.y_velocity = 0
 
-                    if y_velocity < 0:
+                    if self.y_velocity < 0:
                         self.rect.top = entity.rect.bottom
                         self.y_velocity = 0
 
@@ -89,8 +90,6 @@ class Player(Character):
             color = color,
             speed = 1,
         )
-
-
 
 
 class NonPlayer(Character):
