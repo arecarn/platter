@@ -43,7 +43,7 @@ class Action(object):
         if self.is_keyboard_event(event):
             keyHandler = self.keyboard_event[event.key][event.type].execute()
 
-    def check(self, player):
+    def check(self):
         for event in pygame.event.get():
             self.handle_keyboard_events(event)
 
@@ -94,6 +94,7 @@ class GoLeft(CharacterCommand):
 class GoRight(CharacterCommand):
     def __init__(self, character):
         super().__init__(character)
+
     def execute(self):
         self.character.go_right()
 
@@ -101,6 +102,7 @@ class GoRight(CharacterCommand):
 class StopX(CharacterCommand):
     def __init__(self, character):
         super().__init__(character)
+
     def execute(self):
         self.character.stop_x()
 
