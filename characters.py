@@ -24,46 +24,33 @@ class Character(entity.Entity):
         self.x_velocity = 0
         self.y_velocity = 0
         self.speed = speed
+        self.collision = CollisionComponent(self)
 
     def update(self, entities):
+        new_entities = []
+        new_entities[:] = entities.sprites()
+        new_entities.remove(self)
+
+
         self.rect.left += self.x_velocity
-        self.collide_x(entities)
+        self.collision.collide_x(new_entities)
+
         self.rect.top += self.y_velocity
-        self.collide_y(entities)
+        self.collision.collide_y(new_entities)
         self.do_behavior()
 
     def do_behavior(self):
         pass
 
-    def collide_x(self, entities):
-        for entity in entities:
-            if isinstance(entity, game_objects.Platform):
-                if pygame.sprite.collide_rect(self, entity):
-
-                    if self.x_velocity > 0:
-                        self.rect.right = entity.rect.left
-
-                    if self.x_velocity < 0:
-                        self.rect.left = entity.rect.right
-
-    def collide_y(self, entities):
-        for entity in entities:
-            if isinstance(entity, game_objects.Platform):
-                if pygame.sprite.collide_rect(self, entity):
-
-                    if self.y_velocity > 0:
-                        self.rect.bottom = entity.rect.top
-                        self.y_velocity = 0
-
-                    if self.y_velocity < 0:
-                        self.rect.top = entity.rect.bottom
-                        self.y_velocity = 0
 
     def go_up(self):
         self.y_velocity = self.speed * -settings.CHARACTER_WALK_SPEED
 
     def go_down(self) :
         self.y_velocity = self.speed * settings.CHARACTER_WALK_SPEED
+
+    def stop_y(self):
+        self.y_velocity = 0
 
     def go_left(self):
         self.x_velocity = self.speed * -settings.CHARACTER_WALK_SPEED
@@ -74,8 +61,31 @@ class Character(entity.Entity):
     def stop_x(self):
         self.x_velocity = 0
 
-    def stop_y(self):
-        self.y_velocity = 0
+
+class CollisionComponent(object):
+    def __init__(self, entity):
+        self.entity = entity
+
+    def collide_x(self, entities):
+        entity = pygame.sprite.spritecollideany(self.entity, entities)
+        while entity != None:
+            if self.entity.x_velocity > 0:
+                self.entity.rect.right = entity.rect.left
+
+            if self.entity.x_velocity < 0:
+                self.entity.rect.left = entity.rect.right
+            entity = pygame.sprite.spritecollideany(self.entity, entities)
+
+    def collide_y(self, entities):
+        entity = pygame.sprite.spritecollideany(self.entity, entities)
+        while entity != None:
+            if self.entity.y_velocity > 0:
+                self.entity.rect.bottom = entity.rect.top
+
+            if self.entity.y_velocity < 0:
+                self.entity.rect.top = entity.rect.bottom
+            entity = pygame.sprite.spritecollideany(self.entity, entities)
+
 
 class Player(Character):
     def __init__(self, x, y, color):
