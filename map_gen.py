@@ -12,7 +12,6 @@ import pygame
 class Map(object):
     def __init__(self, level):
         self.level = level
-        self.platforms = []
 
         self.entities = pygame.sprite.Group()
 
@@ -56,7 +55,6 @@ class Map(object):
                         y,
                         settings.PLATFORM_COLOR
                     )
-                    self.platforms.append(platform)
                     self.entities.add(platform)
 
                 if col == "E":
@@ -65,7 +63,6 @@ class Map(object):
                         y,
                         settings.EXIT_BLOCK_COLOR
                     )
-                    self.platforms.append(exit_block)
                     self.entities.add(exit_block)
 
                 if col == "C":

@@ -26,10 +26,10 @@ def main():
         timer.tick(60)
 
         action.check()
-        characters.player.update(map.platforms)
+        characters.player.update(map.entities)
 
         for npc in characters.npcs:
-            npc.update(map.platforms)
+            npc.update(map.entities)
 
         game_camera.update(characters.player)
         map.draw(offset=game_camera.apply)
