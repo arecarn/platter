@@ -124,7 +124,7 @@ class Exit(InterfaceCommand):
     def __init__(self):
         super().__init__()
 
-    def execute(self):
+    def execute():
         raise SystemExit()
 
 
