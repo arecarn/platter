@@ -12,8 +12,7 @@ def main():
     pygame.init()
     pygame.display.set_caption("Use arrows to move!")
 
-    the_game = game.Game()
-    the_game.build(level._1)
+    the_game = game.Game(level._1)
 
     timer = pygame.time.Clock()
 

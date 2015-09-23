@@ -6,41 +6,26 @@ import camera
 import characters
 import level
 
-Player = None
-
-##############################################################################
-# Map
-# contains text map
-# method to build the map out of platforms
-# method to redraw map
-##############################################################################
 class Game(object):
-    def __init__(self):
+    def __init__(self, level):
+        self.level = level
+
         self.entities = pygame.sprite.Group()
         self.npcs = pygame.sprite.Group()
 
+        self.width  = len(self.level[0])*settings.BLK_SIZE
+        self.height = len(self.level)*settings.BLK_SIZE
 
-
-        self.width = 0
-        self.height = 0
-        self.camera = None
-
-    def update(self):
-        self.camera.update(self.player)
-        settings.BACKGROUND.update()
-
-        for entity in self.entities:
-            entity.update(self.entities, self.camera.apply)
-
-    def build(self, level):
-        self.width  = len(level[0])*settings.BLK_SIZE
-        self.height = len(level)*settings.BLK_SIZE
         self.camera = camera.Camera(self.width, self.height)
 
+        self.build()
+
+
+    def build(self):
         x = 0
         y = 0
 
-        for row_number, row in enumerate(level):
+        for row_number, row in enumerate(self.level):
             for col_number, col in enumerate(row):
 
                 if col == "P":
@@ -80,10 +65,7 @@ class Game(object):
             for entity in self.entities:
                 entity.image.convert()
 
-
-
-game = Game()
-game.build(level._1)
-
-def getActiveGamer():
-    return game
+    def update(self):
+        self.camera.update(self.player)
+        settings.BACKGROUND.update()
+        self.entities.update(self.entities, self.camera.apply)
