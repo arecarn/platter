@@ -28,4 +28,9 @@ class Entity(pygame.sprite.Sprite):
     def collide_action(self):
         pass
 
+    def draw(self, camera):
+        settings.SCREEN.blit(self.image, camera(self))
+
+    def update(self, entities, camera):
+        self.draw(camera)
 

@@ -1,8 +1,9 @@
 import pygame
-import entity
 import settings
 import game_objects
+
 import actions
+import entity
 
 
 class Character(entity.Entity):
@@ -26,7 +27,7 @@ class Character(entity.Entity):
         self.speed = speed
         self.collision = CollisionComponent(self)
 
-    def update(self, entities):
+    def update(self, entities, camera):
         new_entities = []
         new_entities[:] = entities.sprites()
         new_entities.remove(self)
@@ -38,6 +39,7 @@ class Character(entity.Entity):
         self.rect.top += self.y_velocity
         self.collision.collide_y(new_entities)
         self.do_behavior()
+        self.draw(camera)
 
     def do_behavior(self):
         pass
@@ -86,6 +88,50 @@ class CollisionComponent(object):
                 self.entity.rect.top = entity.rect.bottom
             entity = pygame.sprite.spritecollideany(self.entity, entities)
 
+class InputComponent(object):
+    def __init__(self, entity):
+        self.entity = entity
+        self.keyboard_event = {
+
+            pygame.K_UP : {
+                pygame.KEYDOWN : actions.GoUp(self.entity),
+                pygame.KEYUP   : actions.StopY(self.entity),
+                },
+
+            pygame.K_DOWN : {
+                pygame.KEYDOWN : actions.GoDown(self.entity),
+                pygame.KEYUP   : actions.StopY(self.entity),
+                },
+
+            pygame.K_LEFT : {
+                pygame.KEYDOWN : actions.GoLeft(self.entity),
+                pygame.KEYUP   : actions.StopX(self.entity),
+                },
+
+            pygame.K_RIGHT : {
+                pygame.KEYDOWN : actions.GoRight(self.entity),
+                pygame.KEYUP   : actions.StopX(self.entity),
+                },
+
+            pygame.K_ESCAPE: {
+                pygame.KEYDOWN : actions.Exit,
+                pygame.KEYUP   : actions.DoNothing,
+            },
+        }
+
+    def is_keyboard_event(self, event):
+        return ((event.type == pygame.KEYDOWN or
+                event.type == pygame.KEYUP) and
+                event.key in self.keyboard_event.keys())
+
+    def handle_keyboard_events(self, event):
+        if self.is_keyboard_event(event):
+            keyHandler = self.keyboard_event[event.key][event.type].execute()
+
+    def update(self):
+        events = pygame.event.get()
+        for event in events:
+            self.handle_keyboard_events(event)
 
 class Player(Character):
     def __init__(self, x, y, color):
@@ -96,7 +142,10 @@ class Player(Character):
             color = color,
             speed = 1,
         )
+        self.input_handler = InputComponent(self)
 
+    def do_behavior(self):
+        self.input_handler.update()
 
 class NonPlayer(Character):
     def __init__(self, x, y, color):
@@ -109,7 +158,9 @@ class NonPlayer(Character):
         )
 
     def do_behavior(self):
-        self.follow(player)
+        pass
+        # player = game.getActiveGame()
+        # self.follow(player)
 
     # TODO make this a "Behavior" and mode it to that class
     def follow(self, target):
@@ -130,5 +181,3 @@ class NonPlayer(Character):
             actions.GoDown(self).execute()
 
 
-player = Player(0 , 0 , settings.CHARACTER_COLOR)
-npcs = []

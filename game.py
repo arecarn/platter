@@ -1,7 +1,12 @@
-import settings
-import characters
-import game_objects
 import pygame
+import settings
+import game_objects
+
+import camera
+import characters
+import level
+
+Player = None
 
 ##############################################################################
 # Map
@@ -9,44 +14,33 @@ import pygame
 # method to build the map out of platforms
 # method to redraw map
 ##############################################################################
-class Map(object):
-    def __init__(self, level):
-        self.level = level
-
+class Game(object):
+    def __init__(self):
         self.entities = pygame.sprite.Group()
-
-        # TODO mode map into separate files
-        self.width  = len(self.level[0])*settings.BLK_SIZE
-        self.height = len(self.level)*settings.BLK_SIZE
-        self.screen = pygame.display.set_mode(
-            settings.DISPLAY,
-            settings.FLAGS,
-            settings.DEPTH
-        )
-        self.background = game_objects.Background(
-            settings.BACKGROUND_COLOR,
-            settings.BLK_SIZE,
-            settings.BLK_SIZE
-        )
+        self.npcs = pygame.sprite.Group()
 
 
-    def draw(self, offset):
-        for y in range(settings.WIN_HEIGHT // settings.BLK_SIZE):
-            for x in range(settings.WIN_WIDTH // settings.BLK_SIZE):
-                self.screen.blit(
-                        self.background,
-                        (x * settings.BLK_SIZE, y * settings.BLK_SIZE)
-                    )
+
+        self.width = 0
+        self.height = 0
+        self.camera = None
+
+    def update(self):
+        self.camera.update(self.player)
+        settings.BACKGROUND.update()
+
         for entity in self.entities:
-            self.screen.blit(entity.image, offset(entity))
+            entity.update(self.entities, self.camera.apply)
 
+    def build(self, level):
+        self.width  = len(level[0])*settings.BLK_SIZE
+        self.height = len(level)*settings.BLK_SIZE
+        self.camera = camera.Camera(self.width, self.height)
 
-
-    def build(self):
         x = 0
         y = 0
 
-        for row_number, row in enumerate(self.level):
+        for row_number, row in enumerate(level):
             for col_number, col in enumerate(row):
 
                 if col == "P":
@@ -66,9 +60,9 @@ class Map(object):
                     self.entities.add(exit_block)
 
                 if col == "C":
-                    characters.player.set_pos(x, y)
-                    characters.player.set_color(settings.CHARACTER_COLOR)
-                    self.entities.add(characters.player)
+                    self.player = characters.Player(x, y, settings.CHARACTER_COLOR)
+                    Player = self.player
+                    self.entities.add(self.player)
 
                 if col == "N":
                     npc = characters.NonPlayer(
@@ -77,7 +71,7 @@ class Map(object):
                         settings.NPC_COLOR
                     )
                     self.entities.add(npc)
-                    characters.npcs.append(npc)
+                    self.npcs.add(npc)
 
                 x += settings.BLK_SIZE
             y += settings.BLK_SIZE
@@ -85,3 +79,11 @@ class Map(object):
 
             for entity in self.entities:
                 entity.image.convert()
+
+
+
+game = Game()
+game.build(level._1)
+
+def getActiveGamer():
+    return game
