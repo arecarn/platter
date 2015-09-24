@@ -45,7 +45,11 @@ class Game(object):
                     self.entities.add(exit_block)
 
                 if col == "C":
-                    self.player = characters.Player(x, y, settings.CHARACTER_COLOR)
+                    self.player = characters.Player(
+                        x,
+                        y,
+                        settings.CHARACTER_COLOR
+                    )
                     self.entities.add(self.player)
 
                 if col == "N":
@@ -60,9 +64,6 @@ class Game(object):
                 x += settings.BLK_SIZE
             y += settings.BLK_SIZE
             x = 0
-
-            for entity in self.entities:
-                entity.image.convert()
 
     def update_camera(self):
         self.camera.update(self.player)

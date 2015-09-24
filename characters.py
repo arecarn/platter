@@ -11,20 +11,18 @@ class Character(entity.Entity):
         self,
         x,
         y,
-        size,
         color,
         speed,
     ):
-        entity.Entity.__init__(
-                self,
+        super().__init__(
                 x,
                 y,
                 color
             )
 
+        self.speed = speed
         self.x_velocity = 0
         self.y_velocity = 0
-        self.speed = speed
         self.collision = CollisionComponent(self)
 
     def update(self, world):
@@ -139,7 +137,6 @@ class Player(Character):
         super().__init__(
             x,
             y,
-            size = 1,
             color = color,
             speed = 1,
         )
@@ -154,7 +151,6 @@ class NonPlayer(Character):
         super().__init__(
             x,
             y,
-            size = 2,
             color = color,
             speed = 0.25,
         )

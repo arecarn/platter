@@ -9,6 +9,7 @@ class Entity(pygame.sprite.Sprite):
         self.image = pygame.Surface((settings.BLK_SIZE, settings.BLK_SIZE))
         self.image.fill(pygame.Color(color))
         self.rect = pygame.Rect(x, y, settings.BLK_SIZE, settings.BLK_SIZE)
+        self.image.convert()
 
     def set_pos(self, x, y):
         self.rect.top = y
