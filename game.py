@@ -12,16 +12,16 @@ class Game(object):
 
         self.entities = pygame.sprite.Group()
         self.npcs = pygame.sprite.Group()
+        self.player = None
 
         self.width  = len(self.level[0])*settings.BLK_SIZE
         self.height = len(self.level)*settings.BLK_SIZE
 
         self.camera = camera.Camera(self.width, self.height)
 
-        self.build()
+        self.build_level()
 
-
-    def build(self):
+    def build_level(self):
         x = 0
         y = 0
 
@@ -46,7 +46,6 @@ class Game(object):
 
                 if col == "C":
                     self.player = characters.Player(x, y, settings.CHARACTER_COLOR)
-                    Player = self.player
                     self.entities.add(self.player)
 
                 if col == "N":
@@ -65,7 +64,5 @@ class Game(object):
             for entity in self.entities:
                 entity.image.convert()
 
-    def update(self):
+    def update_camera(self):
         self.camera.update(self.player)
-        settings.BACKGROUND.update()
-        self.entities.update(self.entities, self.camera.apply)

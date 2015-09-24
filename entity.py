@@ -20,7 +20,6 @@ class Entity(pygame.sprite.Sprite):
     def update_location(self, entities):
         pass
 
-
     def collide(self, entities):
         self.collide_action()
         pass
@@ -31,6 +30,6 @@ class Entity(pygame.sprite.Sprite):
     def draw(self, camera):
         settings.SCREEN.blit(self.image, camera(self))
 
-    def update(self, entities, camera):
-        self.draw(camera)
+    def update(self, world):
+        self.draw(world.camera.apply)
 

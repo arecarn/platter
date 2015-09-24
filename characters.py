@@ -27,9 +27,9 @@ class Character(entity.Entity):
         self.speed = speed
         self.collision = CollisionComponent(self)
 
-    def update(self, entities, camera):
+    def update(self, world):
         new_entities = []
-        new_entities[:] = entities.sprites()
+        new_entities[:] = world.entities.sprites()
         new_entities.remove(self)
 
 
@@ -38,12 +38,11 @@ class Character(entity.Entity):
 
         self.rect.top += self.y_velocity
         self.collision.collide_y(new_entities)
-        self.do_behavior()
-        self.draw(camera)
+        self.do_behavior(world)
+        self.draw(world.camera.apply)
 
-    def do_behavior(self):
+    def do_behavior(self, world):
         pass
-
 
     def go_up(self):
         self.y_velocity = self.speed * -settings.CHARACTER_WALK_SPEED
@@ -87,6 +86,7 @@ class CollisionComponent(object):
             if self.entity.y_velocity < 0:
                 self.entity.rect.top = entity.rect.bottom
             entity = pygame.sprite.spritecollideany(self.entity, entities)
+
 
 class InputComponent(object):
     def __init__(self, entity):
@@ -133,6 +133,7 @@ class InputComponent(object):
         for event in events:
             self.handle_keyboard_events(event)
 
+
 class Player(Character):
     def __init__(self, x, y, color):
         super().__init__(
@@ -144,8 +145,9 @@ class Player(Character):
         )
         self.input_handler = InputComponent(self)
 
-    def do_behavior(self):
+    def do_behavior(self, world):
         self.input_handler.update()
+
 
 class NonPlayer(Character):
     def __init__(self, x, y, color):
@@ -157,14 +159,11 @@ class NonPlayer(Character):
             speed = 0.25,
         )
 
-    def do_behavior(self):
-        pass
-        # player = game.getActiveGame()
-        # self.follow(player)
+    def do_behavior(self, world):
+        self.follow(world.player)
 
-    # TODO make this a "Behavior" and mode it to that class
     def follow(self, target):
-
+        # TODO make this a "Behavior" and mode it to that class
         target_x , target_y = target.rect.center
         x , y = self.rect.center
 

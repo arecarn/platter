@@ -12,13 +12,16 @@ def main():
     pygame.init()
     pygame.display.set_caption("Use arrows to move!")
 
-    the_game = game.Game(level._1)
+    world = game.Game(level._1)
 
     timer = pygame.time.Clock()
 
     while 1:
         timer.tick(60)
-        the_game.update()
+
+        settings.BACKGROUND.update()
+        world.update_camera()
+        world.entities.update(world) #could each entity have an instance of the game
         pygame.display.update()
 
 if __name__ == "__main__":
